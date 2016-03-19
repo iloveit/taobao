@@ -42,7 +42,8 @@ class DataStore(object):
                                 Column('realName', String(40)),
                                 Column('city', String(20)),
                                 Column('cardUrl', String(256)),
-                                Column('avatarUrl', String(256)))
+                                Column('avatarUrl', String(256)),
+                                Column('downed', String(1)))
             print("create db table:mminfo")
             info_table.create()
     
@@ -57,6 +58,7 @@ class DataStore(object):
         girlInfo.city = girl['city']
         girlInfo.cardUrl = girl['cardUrl']
         girlInfo.avatarUrl = girl['avatarUrl']
+        girlInfo.downed = 'N'
         
         Session = sessionmaker(bind = self.engine)
         session = Session()
@@ -69,7 +71,16 @@ class DataStore(object):
             session.rollback()
         finally:
             session.close()
-        
+    
+    def update(self,userId):
+        info_table = Table('mminfo', self.metadata, autoload=True)
+        clear_mappers()
+        mapper(MMInfo, info_table)
+        session = create_session()
+        query = session.query(MMInfo)
+        query.filter(MMInfo.userId == userId).update({'downed':'Y'})
+        session.close()
+
         
     def select(self):
         info_table = Table('mminfo', self.metadata, autoload=True)
@@ -77,13 +88,13 @@ class DataStore(object):
         mapper(MMInfo, info_table)
         session = create_session()
         query = session.query(MMInfo)
-        
+        session.close()
         return query.all()
     
     def saveImage(self, imgUrl,imgName = "default.jpg"):
         response = requests.get(imgUrl, stream=True)
         image = response.content
-        DstDir="/Users/qzdx/picture/"
+        DstDir="D:\\picture\\"
         print("save:"+DstDir+imgName+"\n")
         try:
             with open(DstDir+imgName ,"wb") as jpg:
