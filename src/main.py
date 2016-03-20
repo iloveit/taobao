@@ -27,9 +27,11 @@ def downPhoto():
     ds = DataStore()
     i = 0
     for girlInfo in ds.select():
+        i += 1
         userId = girlInfo.userId
         downed = girlInfo.downed
         if downed == 'Y':
+            print('pic %2d: %s-%s had downloaded.' % (i,girlInfo.city, girlInfo.realName))
             continue
         
         urlStr = girlInfo.cardUrl
@@ -38,15 +40,13 @@ def downPhoto():
         filetype = urlStr.split('.')
         imgUrl = 'http:' + urlStr
         imgName = girlInfo.city + '-' + girlInfo.realName + '.' + filetype[-1]
+        print('pic %d: %s-%s is downloading.' % (i,girlInfo.city, girlInfo.realName))
         ds.saveImage(imgUrl, imgName)
-        ds.update(userId)
-
-        print i,girlInfo.realName, girlInfo.city
-        i += 1
+        ds.update(userId)        
             
 def main():
-    #getData(1, 100)
-    #showData()
+    getData(1, 10)
+    showData()
     downPhoto()
 
 if __name__ == "__main__" :

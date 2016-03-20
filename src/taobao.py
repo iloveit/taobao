@@ -1,6 +1,7 @@
 #coding = utf-8
 import requests
 import json
+import os
 from sqlalchemy import *
 from sqlalchemy.orm import *
 
@@ -91,17 +92,21 @@ class DataStore(object):
         session.close()
         return query.all()
     
-    def saveImage(self, imgUrl,imgName = "default.jpg"):
+    def saveImage(self, imgUrl,imgName = 'default.jpg'):
         response = requests.get(imgUrl, stream=True)
         image = response.content
-        DstDir="D:\\picture\\"
-        print("save:"+DstDir+imgName+"\n")
+        DstDir = ''
+        if os.name == 'nt':
+            DstDir = 'D:\\picture\\'
+        else:
+            DstDir = '/Users/qzdx/picture/'
+        print('save:'+DstDir+imgName)
         try:
-            with open(DstDir+imgName ,"wb") as jpg:
+            with open(DstDir+imgName ,'wb') as jpg:
                 jpg.write(image)
                 return
         except IOError:
-            print("IO Error\n")
+            print('IO Error\n')
             return
         finally:
             jpg.close()
